@@ -10,7 +10,6 @@ class WelcomeScreen extends StatefulWidget {
   final String identificacion;
   final Map<String, dynamic> clientData;
   // Recibe los datos del cliente
-
   const WelcomeScreen({
     Key? key,
     required this.username,
@@ -36,11 +35,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   void cerrarSesion(BuildContext context) {
-    // Aquí va la lógica para cerrar sesión, por ejemplo:
-    // Si estás utilizando FirebaseAuth:
-    // FirebaseAuth.instance.signOut();
-
-    // O si necesitas navegar a la pantalla de login:
     Navigator.pushReplacementNamed(context, '/login'); // Redirige al login
   }
 
@@ -369,51 +363,92 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-                child: Text(
-              'No cuenta con pagos pendientes.',
-              style: TextStyle(
-                fontSize: 15,
-                color: Color.fromARGB(255, 0, 0, 0),
+              child: Text(
+                'No cuenta con pagos pendientes.',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                ),
               ),
-            ));
+            );
           } else {
             final payments = snapshot.data!;
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Pagos pendientes',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Encabezado con diseño atractivo
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blueAccent, Colors.lightBlueAccent],
                     ),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
                   ),
-                  const SizedBox(height: 20),
-                  // Mostrar cada pago en el historial
-                  for (var payment in payments) _buildPendingRow(payment),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Pagos pendientes',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      child: const Text('Cerrar'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Contenido del modal con scroll
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Mostrar cada pago en el historial
+                        for (var payment in payments) _buildPendingRow(payment),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 20),
+                // Botón "Cerrar"
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.3),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Cerrar',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           }
         },
@@ -438,7 +473,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black26,
@@ -447,36 +482,102 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
             ],
           ),
-          child: Row(
+          child: Column(
             children: [
-              // Fecha
-              Expanded(
-                child: Text(
-                  'Fecha: ${payment['fecha_inicio_cobro']}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
+              // Encabezado con diseño atractivo
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueAccent, Colors.lightBlueAccent],
                   ),
-                  overflow: TextOverflow.ellipsis,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Detalles de Pago',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              // Monto
-              Text(
-                '\$${valorPendiente.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.redAccent,
-                ),
-              ),
-              const SizedBox(width: 10),
-              // Ícono de pago pendiente al lado derecho
-              Icon(
-                Icons.account_balance_wallet,
-                color: Colors.green,
-                size: 20,
+              const SizedBox(height: 10),
+              // Contenido del modal
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Detalle: ${payment['detalle_cuenta']}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Fecha: ${payment['fecha_inicio_cobro']}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Valor pendiente: \$${valorPendiente.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Botón "Pagar Ahora" con InkWell
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: InkWell(
+                      onTap: () {
+                        // Aquí puedes agregar la lógica para iniciar el pago
+                        _showPaymentDetailsModal(payment);
+                        print("Pagar Ahora button clicked");
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.3),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          'Pagar Ahora',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -510,7 +611,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         color: Colors.green,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Text(
                       'Fecha de cobro: ${payment['fecha_inicio_cobro']}',
                       style: const TextStyle(fontSize: 16),
@@ -558,48 +659,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       const SizedBox(height: 20),
                     ],
                     // Botón "Pagar ahora" con lógica de envío
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_imageFile == null) {
-                            // Mostrar mensaje si no hay imagen
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Por favor, adjunta una imagen antes de pagar.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
 
-                          try {
-                            await ApiService.enviarPago(
-                              _imageFile!,
-                              payment['idcuentas_por_cobrar'].toString(),
-                            );
-                            Navigator.pop(context); // Cierra el modal
-                            _showPaymentConfirmation(payment);
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error al enviar el pago: $e'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Pagar ahora'),
-                      ),
-                    ),
                     const SizedBox(height: 20),
                     // Botón para tomar foto
                     Center(
@@ -648,6 +708,49 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                         ),
                         child: const Text('Elegir de la galería'),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_imageFile == null) {
+                            // Mostrar mensaje si no hay imagen
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Por favor, adjunta una imagen antes de pagar.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+
+                          try {
+                            await ApiService.enviarPago(
+                              _imageFile!,
+                              payment['idcuentas_por_cobrar'].toString(),
+                            );
+                            Navigator.pop(context); // Cierra el modal
+                            _showPaymentConfirmation(payment);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error al enviar el pago: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Enviar Pago'),
                       ),
                     ),
                   ],
@@ -874,57 +977,90 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             final payments = snapshot.data!;
 
             // Concatenamos la IP con la URL de cada pago si existe
-
-            return Container(
-              padding: const EdgeInsets.all(20),
-              width: 350,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      'Historial de Pagos',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade700,
-                      ),
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Encabezado con diseño atractivo
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blueAccent, Colors.lightBlueAccent],
                     ),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
                   ),
-                  const SizedBox(height: 15),
-                  SizedBox(
-                    height: 250,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: payments.length,
-                      separatorBuilder: (context, index) =>
-                          Divider(color: Colors.grey.shade300),
-                      itemBuilder: (context, index) {
-                        final payment = payments[index];
-                        return _buildPaymentRow(payment);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade700,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Historial de Pagos',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      child:
-                          const Text('Cerrar', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+
+                // Contenido del modal
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 250,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: payments.length,
+                          separatorBuilder: (context, index) =>
+                              Divider(color: Colors.grey.shade300),
+                          itemBuilder: (context, index) {
+                            final payment = payments[index];
+                            return _buildPaymentRow(payment);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Botón más atractivo con efecto InkWell
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.green.withOpacity(0.3),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Cerrar',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }
         },

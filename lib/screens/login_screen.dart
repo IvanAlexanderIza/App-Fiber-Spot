@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen>
                   style: GoogleFonts.montserrat(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple[700],
+                    color: Colors.blue[700],
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen>
                         decoration: InputDecoration(
                           labelText: 'Usuario',
                           prefixIcon:
-                              const Icon(Icons.person, color: Colors.purple),
+                              const Icon(Icons.person, color: Colors.blue),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -171,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen>
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
                           prefixIcon:
-                              const Icon(Icons.lock, color: Colors.purple),
+                              const Icon(Icons.lock, color: Colors.blue),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -191,13 +191,13 @@ class _LoginScreenState extends State<LoginScreen>
                       const SizedBox(height: 30),
                       // Botón de inicio de sesión
                       _isLoading
-                          ? const SpinKitCircle(color: Colors.purple, size: 50)
+                          ? const SpinKitCircle(color: Colors.blue, size: 50)
                           : SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: _handleLogin,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple[700],
+                                  backgroundColor: Colors.blue[700],
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
                                   ),
