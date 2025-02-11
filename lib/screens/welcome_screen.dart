@@ -293,7 +293,78 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         label: 'Promociones',
                         color: Colors.purple,
                         onTap: () {
-                          print("Abriendo soporte técnico...");
+                          showGeneralDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierLabel: "Cerrar",
+                            barrierColor: Colors.black.withOpacity(
+                                0.5), // Fondo oscuro semitransparente
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return Center(
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Stack(
+                                    children: [
+                                      // Contenedor principal del modal
+                                      Center(
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              1.0, // 85% del ancho de la pantalla
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.85, // 70% del alto de la pantalla
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Expanded(
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius
+                                                          .vertical(
+                                                          top: Radius.circular(
+                                                              12)),
+                                                  child: Image.asset(
+                                                    'assets/planprincipal.jpeg', // Imagen de los planes
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const SizedBox(height: 10),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      // Botón de cierre en la esquina superior derecha
+                                      Positioned(
+                                        top: 40,
+                                        right: 20,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.close,
+                                              color: Colors.white, size: 30),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Cierra el modal
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
                       ),
                       _buildServiceCard(
@@ -1042,7 +1113,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.green.withOpacity(0.3),
+                            color: Colors.blue.withOpacity(0.3),
                             blurRadius: 10,
                             spreadRadius: 2,
                             offset: const Offset(0, 4),
