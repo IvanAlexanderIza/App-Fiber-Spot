@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/planes.dart';
 import 'package:frontend/services/api_service.dart';
@@ -6,12 +8,14 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class WelcomeScreen extends StatefulWidget {
+  final String idUsuario;
   final String username;
   final String identificacion;
   final Map<String, dynamic> clientData;
   // Recibe los datos del cliente
   const WelcomeScreen({
     Key? key,
+    required this.idUsuario,
     required this.username,
     required this.identificacion,
     required this.clientData, // Recibe los datos del cliente
@@ -38,6 +42,228 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Navigator.pushReplacementNamed(context, '/login'); // Redirige al login
   }
 
+  Future<void> _changePassword() async {
+    String? newPassword = await _showPasswordDialog(context);
+
+    if (newPassword != null && newPassword.isNotEmpty) {
+      try {
+        var updateResponse =
+            await ApiService.updatePassword(widget.idUsuario, newPassword);
+
+        if (updateResponse['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Contraseña actualizada exitosamente'),
+          ));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Error al actualizar la contraseña: ${updateResponse['message']}'),
+          ));
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error al actualizar la contraseña: $e'),
+        ));
+      }
+    }
+  }
+
+  Future<String?> _showPasswordDialog(BuildContext context) async {
+    TextEditingController passwordController = TextEditingController();
+    bool _isPasswordVisible =
+        false; // Variable para controlar la visibilidad de la contraseña
+
+    return await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Cambiar Contraseña',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.blue[800], // Color del título
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0), // Bordes redondeados
+          ),
+          contentPadding: EdgeInsets.all(20), // Padding general
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  hintText: 'Ingresa la nueva contraseña',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide(color: Colors.blue), // Borde azul
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide(
+                        color: Colors.blueAccent), // Borde cuando está enfocado
+                  ),
+                  prefixIcon:
+                      Icon(Icons.lock, color: Colors.blue), // Ícono de candado
+                  hintStyle: TextStyle(
+                      color: Colors.grey[600]), // Color del texto del hint
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 15), // Padding dentro del TextField
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off, // Cambia el ícono
+                      color: Colors.blue,
+                    ),
+                    onPressed: () {
+                      // Cambia el estado de visibilidad de la contraseña
+                      _isPasswordVisible = !_isPasswordVisible;
+                      // Necesitamos que la UI se actualice
+                      (context as Element)
+                          .reassemble(); // Actualiza el estado para que el ícono cambie
+                    },
+                  ),
+                ),
+                obscureText:
+                    !_isPasswordVisible, // Si la contraseña está visible o no
+              ),
+              SizedBox(
+                  height: 15), // Espacio entre el campo de texto y los botones
+            ],
+          ),
+          actions: <Widget>[
+            // Botón Cancelar
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.grey[400], // Color de fondo del botón
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(10.0), // Bordes redondeados
+                ),
+                padding: EdgeInsets.symmetric(
+                    vertical: 10, horizontal: 20), // Padding del botón
+              ),
+              child: Text('Cancelar'),
+            ),
+            // Botón Aceptar
+            TextButton(
+              onPressed: () {
+                // Verificar si el campo de contraseña está vacío
+                if (passwordController.text.isEmpty) {
+                  // Mostrar el mensaje de error usando _showErrorDialog
+                  _showErrorDialog(
+                      context, 'Por favor ingresa una nueva contraseña');
+                } else {
+                  // Retorna la nueva contraseña si no está vacía
+                  Navigator.of(context).pop(passwordController.text);
+                }
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue, // Color de fondo del botón
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(10.0), // Bordes redondeados
+                ),
+                padding: EdgeInsets.symmetric(
+                    vertical: 10, horizontal: 20), // Padding del botón
+              ),
+              child: Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white, // Fondo blanco para mayor claridad
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+                25.0), // Bordes más redondeados para un diseño moderno
+          ),
+          elevation: 15, // Agregar sombra más profunda para un efecto 3D
+          title: Row(
+            children: [
+              Icon(
+                Icons
+                    .warning_amber_rounded, // Ícono más llamativo de advertencia
+                color: const Color.fromARGB(
+                    255, 255, 0, 0), // Un toque de naranja para captar atención
+                size: 30,
+              ),
+              SizedBox(width: 15),
+              Text(
+                '¡Atención!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(
+                      255, 255, 0, 0), // Color llamativo para el título
+                ),
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: EdgeInsets.symmetric(
+                vertical:
+                    15), // Añadí un poco más de padding para que el contenido tenga aire
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 17,
+                color: Colors.black87, // Texto oscuro para mayor contraste
+                fontFamily: 'Montserrat', // Usé una fuente más elegante
+                fontWeight:
+                    FontWeight.w500, // Peso medio para una lectura suave
+              ),
+              textAlign: TextAlign
+                  .center, // Centrar el mensaje de error para mayor claridad
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el cuadro de diálogo
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white, // Texto blanco para el botón
+                backgroundColor: const Color.fromARGB(
+                    255, 251, 0, 0), // Fondo naranja para el botón
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                      30.0), // Bordes bien redondeados para suavizar
+                ),
+                padding: EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal:
+                        35), // Aumenté el padding para hacerlo más cómodo
+                textStyle: TextStyle(
+                  fontSize: 17, // Aumenté el tamaño del texto del botón
+                  fontWeight:
+                      FontWeight.bold, // Hacer que el texto sea más destacado
+                ),
+              ),
+              child: Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final clientData = widget.clientData; // Obtén los datos del cliente
@@ -53,16 +279,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         backgroundColor: Colors.blue,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Acción para las notificaciones
-            },
-          ),
           PopupMenuButton<String>(
-            onSelected: (value) {
+            onSelected: (value) async {
               if (value == 'config') {
-                // Acción para configuración
+                await _changePassword();
               } else if (value == 'logout') {
                 // Acción para cerrar sesión
                 cerrarSesion(context);
@@ -71,7 +291,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             itemBuilder: (BuildContext context) => [
               const PopupMenuItem<String>(
                 value: 'config',
-                child: Text('Configuración'),
+                child: Text('cambiar contraseña'),
               ),
               const PopupMenuItem<String>(
                 value: 'logout',
@@ -189,6 +409,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             context: context,
                             barrierDismissible: true,
                             barrierLabel: "Cerrar",
+                            // ignore: duplicate_ignore
+                            // ignore: deprecated_member_use
                             barrierColor: Colors.black.withOpacity(
                                 0.5), // Fondo oscuro semitransparente
                             transitionDuration:
@@ -297,6 +519,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             context: context,
                             barrierDismissible: true,
                             barrierLabel: "Cerrar",
+                            // ignore: duplicate_ignore
+                            // ignore: deprecated_member_use
                             barrierColor: Colors.black.withOpacity(
                                 0.5), // Fondo oscuro semitransparente
                             transitionDuration:
@@ -365,14 +589,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               );
                             },
                           );
-                        },
-                      ),
-                      _buildServiceCard(
-                        icon: Icons.devices_other,
-                        label: 'Productos',
-                        color: Colors.teal,
-                        onTap: () {
-                          print("Mostrando información de contacto...");
                         },
                       ),
                     ],
@@ -501,6 +717,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
+                            // ignore: duplicate_ignore
+                            // ignore: deprecated_member_use
                             color: Colors.blue.withOpacity(0.3),
                             blurRadius: 10,
                             spreadRadius: 2,

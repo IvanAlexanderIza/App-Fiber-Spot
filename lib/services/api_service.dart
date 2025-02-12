@@ -51,6 +51,32 @@ class ApiService {
     return await _post('datos-cliente', {'identificacion': identificacion});
   }
 
+  /// Método para actualizar la contraseña
+  static Future<Map<String, dynamic>> updatePassword(
+      String idUsuario, String newPassword) async {
+    try {
+      // Realizar la solicitud POST con el id_usuario y la nueva contraseña
+      final response = await http.post(
+        Uri.parse('$baseUrl/reset'),
+        body: {
+          'id_usuario': idUsuario,
+          'password': newPassword, // Aquí se usa 'password' como en Postman
+        },
+      );
+
+      // Verificar si la respuesta es exitosa
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        throw Exception('Error al conectar con la API');
+      }
+    } catch (e) {
+      print('Error al actualizar la contraseña: $e');
+      throw Exception('Error al conectar con la API');
+    }
+  }
+
   /// Método para obtener el historial de pagos
   static Future<List<Map<String, dynamic>>> getPaymentHistory(
       String identificacion) async {

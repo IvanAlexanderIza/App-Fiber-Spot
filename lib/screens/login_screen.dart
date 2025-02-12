@@ -63,6 +63,7 @@ class _LoginScreenState extends State<LoginScreen>
             context,
             MaterialPageRoute(
               builder: (context) => WelcomeScreen(
+                idUsuario: data['id_usuario'], // Pasa el id_usuario
                 username: data['nombre_cliente'],
                 identificacion: data['identificacion'],
                 clientData:
@@ -75,8 +76,12 @@ class _LoginScreenState extends State<LoginScreen>
               'Error al obtener datos del cliente: ${clientDataResponse['message']}');
         }
       } else {
-        // Mostrar el mensaje de error del servidor
-        _showErrorSnackBar(' ${response['message']}');
+        // Si el usuario no existe o hay algún error con la autenticación
+        if (response['message'] == 'El usuario ingresado no existe') {
+          _showErrorDialog('El usuario o la contraseña son incorrectos.');
+        } else {
+          _showErrorSnackBar(' ${response['message']}');
+        }
       }
     } catch (e) {
       _showErrorSnackBar('Error al conectar con el servidor: $e');
@@ -85,6 +90,76 @@ class _LoginScreenState extends State<LoginScreen>
         _isLoading = false;
       });
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white, // Fondo limpio y claro
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // Bordes redondeados
+          ),
+          elevation: 15, // Sombra profunda para resaltar el cuadro
+          title: Row(
+            children: [
+              Icon(
+                Icons.error_outline, // Ícono de error moderno
+                color: Colors.redAccent,
+                size: 30,
+              ),
+              SizedBox(width: 10),
+              Text(
+                '¡Error!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent, // Resalta el mensaje de error
+                ),
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: EdgeInsets.symmetric(vertical: 15),
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87, // Texto oscuro para mejor visibilidad
+                fontFamily: 'Roboto', // Fuente moderna y clara
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center, // Alinea el texto al centro
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el cuadro de diálogo
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white, // Texto blanco para el botón
+                backgroundColor: Colors.redAccent, // Fondo rojo para el botón
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(30.0), // Bordes redondeados
+                ),
+                padding: EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 35), // Padding para hacer el botón más cómodo
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight
+                      .bold, // Hace el texto en el botón más destacado
+                ),
+              ),
+              child: Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showErrorSnackBar(String message) {
