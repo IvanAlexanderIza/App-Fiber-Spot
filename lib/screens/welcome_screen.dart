@@ -124,6 +124,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       _isPasswordVisible = !_isPasswordVisible;
                       // Necesitamos que la UI se actualice
                       (context as Element)
+                          // ignore: invalid_use_of_protected_member
                           .reassemble(); // Actualiza el estado para que el ícono cambie
                     },
                   ),
@@ -920,83 +921,115 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Mostrar imagen seleccionada
-                    if (_imageFile != null) ...[
-                      const Text(
-                        'Foto del comprobante:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[200],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            _imageFile!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                    // Botón "Pagar ahora" con lógica de envío
+                    // Cuadro para elegir imagen
+                    Center(
+                      child: GestureDetector(
+                        onTap: () async {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return SingleChildScrollView(
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(12),
+                                      topRight: Radius.circular(12),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        leading: const Icon(Icons.camera_alt),
+                                        title: const Text('Tomar foto'),
+                                        onTap: () async {
+                                          final picker = ImagePicker();
+                                          final image = await picker.pickImage(
+                                              source: ImageSource.camera);
+                                          if (image != null) {
+                                            setState(() {
+                                              _imageFile = File(image.path);
+                                            });
+                                          }
+                                          Navigator.pop(
+                                              context); // Cierra el bottom sheet
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading:
+                                            const Icon(Icons.photo_library),
+                                        title:
+                                            const Text('Elegir de la galería'),
+                                        onTap: () async {
+                                          // Prevent multiple image picker instances
+                                          if (_imageFile == null) {
+                                            final picker = ImagePicker();
+                                            final image =
+                                                await picker.pickImage(
+                                                    source:
+                                                        ImageSource.gallery);
 
-                    const SizedBox(height: 20),
-                    // Botón para tomar foto
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final picker = ImagePicker();
-                          final image = await picker.pickImage(
-                              source: ImageSource.camera);
-                          if (image != null) {
-                            setState(() {
-                              _imageFile = File(image.path);
-                            });
-                          }
+                                            if (image != null) {
+                                              setState(() {
+                                                _imageFile = File(image.path);
+                                              });
+                                            }
+                                            Navigator.pop(
+                                                context); // Cierra el bottom sheet
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                          shape: RoundedRectangleBorder(
+                        child: Container(
+                          padding: const EdgeInsets.all(70), // Tamaño mayor
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.blue,
+                              width: 3, // Ancho de borde más grueso
+                            ),
                           ),
+                          child: _imageFile == null
+                              ? Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.cloud_upload,
+                                      size:
+                                          60, // Tamaño más grande para el icono
+                                      color: Colors.blue,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Adjuntar Imagen',
+                                      style: TextStyle(
+                                        fontSize:
+                                            18, // Tamaño más grande para el texto
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(
+                                    _imageFile!,
+                                    fit: BoxFit
+                                        .cover, // Ajuste de la imagen para cubrir el cuadro
+                                    height: 200,
+                                    width: double.infinity,
+                                  ),
+                                ),
                         ),
-                        child: const Text('Tomar foto'),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Botón para elegir de la galería
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final picker = ImagePicker();
-                          final image = await picker.pickImage(
-                              source: ImageSource.gallery);
-                          if (image != null) {
-                            setState(() {
-                              _imageFile = File(image.path);
-                            });
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Elegir de la galería'),
                       ),
                     ),
                     const SizedBox(height: 10),
