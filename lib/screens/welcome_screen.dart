@@ -1,7 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/planes.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -412,8 +411,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             context: context,
                             barrierDismissible: true,
                             barrierLabel: "Cerrar",
-                            // ignore: duplicate_ignore
-                            // ignore: deprecated_member_use
                             barrierColor: Colors.black.withOpacity(
                                 0.5), // Fondo oscuro semitransparente
                             transitionDuration:
@@ -431,11 +428,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              1.0, // 85% del ancho de la pantalla
+                                              0.85, // 85% del ancho de la pantalla
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
-                                              0.85, // 70% del alto de la pantalla
+                                              0.95, // 70% del alto de la pantalla
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
                                             borderRadius:
@@ -444,49 +441,42 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
+                                              // Slider de imágenes
                                               Expanded(
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      const BorderRadius
-                                                          .vertical(
-                                                          top: Radius.circular(
-                                                              12)),
-                                                  child: Image.asset(
-                                                    'assets/planprincipal.jpeg', // Imagen de los planes
-                                                    fit: BoxFit.contain,
+                                                child: CarouselSlider(
+                                                  options: CarouselOptions(
+                                                    autoPlay: true,
+                                                    enlargeCenterPage: true,
+                                                    aspectRatio: 4 / 3,
+                                                    viewportFraction: 1.0,
                                                   ),
+                                                  items: [
+                                                    'assets/planprincipal.jpeg',
+                                                    'assets/plansuperfiber.jpeg',
+                                                    'assets/planmegafiber.jpeg',
+                                                    'assets/planultrafiber.jpeg',
+                                                    'assets/planhyperfiber.jpeg',
+                                                  ].map((imagePath) {
+                                                    return Builder(
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          12)),
+                                                          child: Image.asset(
+                                                            imagePath, // Imagen del slider
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  }).toList(),
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          DetallesPlanesScreen(), // Navega a la nueva pantalla
-                                                    ),
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.blue,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                ),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                                  child: Text(
-                                                      "Ver más detalles",
-                                                      style: TextStyle(
-                                                          color: Colors.white)),
-                                                ),
-                                              ),
                                               const SizedBox(height: 10),
                                             ],
                                           ),
@@ -539,11 +529,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              0.85, // 85% del ancho de la pantalla
+                                              1.0, // Aumentando el ancho al 90%
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
-                                              0.95, // 70% del alto de la pantalla
+                                              0.85, // Ajustando el alto al 80%
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
                                             borderRadius:
@@ -558,8 +548,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                   options: CarouselOptions(
                                                     autoPlay: true,
                                                     enlargeCenterPage: true,
-                                                    aspectRatio: 4 / 3,
-                                                    viewportFraction: 1.0,
+                                                    aspectRatio: 16 /
+                                                        9, // Ajustando el aspecto a 16:9
+                                                    viewportFraction:
+                                                        1.0, // Asegurando que ocupe todo el espacio
                                                   ),
                                                   items: [
                                                     'assets/promocionprincipal.jpeg',
@@ -579,7 +571,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                                           12)),
                                                           child: Image.asset(
                                                             imagePath, // Imagen del slider
-                                                            fit: BoxFit.cover,
+                                                            fit: BoxFit
+                                                                .contain, // Asegura que cubra el contenedor
                                                           ),
                                                         );
                                                       },
@@ -587,8 +580,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                   }).toList(),
                                                 ),
                                               ),
-                                              const SizedBox(height: 10),
-                                              const SizedBox(height: 10),
                                             ],
                                           ),
                                         ),

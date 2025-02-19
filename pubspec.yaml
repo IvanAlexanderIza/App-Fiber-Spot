@@ -77,6 +77,12 @@ flutter:
     - assets/promocionmegafiber.jpeg
     - assets/promocionultrafiber.jpeg
     - assets/promocionhyperfiber.jpeg
+    #planes
+    - assets/planprincipal.jpeg
+    - assets/plansuperfiber.jpeg
+    - assets/planmegafiber.jpeg
+    - assets/planultrafiber.jpeg
+    - assets/planhyperfiber.jpeg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
