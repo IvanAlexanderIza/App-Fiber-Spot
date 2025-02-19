@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/planes.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'dart:io';
 
 class WelcomeScreen extends StatefulWidget {
@@ -520,8 +522,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             context: context,
                             barrierDismissible: true,
                             barrierLabel: "Cerrar",
-                            // ignore: duplicate_ignore
-                            // ignore: deprecated_member_use
                             barrierColor: Colors.black.withOpacity(
                                 0.5), // Fondo oscuro semitransparente
                             transitionDuration:
@@ -539,11 +539,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              1.0, // 85% del ancho de la pantalla
+                                              0.85, // 85% del ancho de la pantalla
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
-                                              0.85, // 70% del alto de la pantalla
+                                              0.95, // 70% del alto de la pantalla
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
                                             borderRadius:
@@ -552,17 +552,39 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
+                                              // Slider de imágenes
                                               Expanded(
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      const BorderRadius
-                                                          .vertical(
-                                                          top: Radius.circular(
-                                                              12)),
-                                                  child: Image.asset(
-                                                    'assets/planprincipal.jpeg', // Imagen de los planes
-                                                    fit: BoxFit.contain,
+                                                child: CarouselSlider(
+                                                  options: CarouselOptions(
+                                                    autoPlay: true,
+                                                    enlargeCenterPage: true,
+                                                    aspectRatio: 4 / 3,
+                                                    viewportFraction: 1.0,
                                                   ),
+                                                  items: [
+                                                    'assets/promocionprincipal.jpeg',
+                                                    'assets/promocionsuperfiber.jpeg',
+                                                    'assets/promocionmegafiber.jpeg',
+                                                    'assets/promocionultrafiber.jpeg',
+                                                    'assets/promocionhyperfiber.jpeg',
+                                                  ].map((imagePath) {
+                                                    return Builder(
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          12)),
+                                                          child: Image.asset(
+                                                            imagePath, // Imagen del slider
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  }).toList(),
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
@@ -893,33 +915,54 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Detalles del pago',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blueAccent, Colors.lightBlueAccent],
+                        ),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Detalles de Pago',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      'Fecha de cobro: ${payment['fecha_inicio_cobro']}',
-                      style: const TextStyle(fontSize: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Fecha de cobro: ${payment['fecha_inicio_cobro']}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Detalle: ${payment['detalle_cuenta']}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Monto pendiente: \$${(double.tryParse(payment['valor_pendiente'].toString()) ?? 0.0).toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Detalle: ${payment['detalle_cuenta']}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Monto pendiente: \$${(double.tryParse(payment['valor_pendiente'].toString()) ?? 0.0).toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.redAccent,
-                      ),
-                    ),
+
                     const SizedBox(height: 20),
                     // Cuadro para elegir imagen
                     Center(
@@ -1037,13 +1080,56 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (_imageFile == null) {
-                            // Mostrar mensaje si no hay imagen
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Por favor, adjunta una imagen antes de pagar.'),
-                                backgroundColor: Colors.red,
-                              ),
+                            // Mostrar un cuadro de diálogo personalizado si no hay imagen
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.deepPurple[
+                                      50], // Fondo suave para el diálogo
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        15.0), // Bordes redondeados
+                                  ),
+                                  title: Text(
+                                    '¡Atención!',
+                                    style: TextStyle(
+                                      color: const Color.fromARGB(255, 255, 18,
+                                          18), // Título en color púrpura
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  content: Text(
+                                    'Por favor, adjunta una imagen antes de proceder con el pago.',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: const Color.fromARGB(
+                                            255,
+                                            255,
+                                            18,
+                                            18), // Color de fondo del botón
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10), // Botón con bordes redondeados
+                                        ),
+                                      ),
+                                      child: Text('Cerrar'),
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .pop(); // Cerrar el diálogo
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                             return;
                           }
@@ -1065,14 +1151,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: Colors.blue[700],
                           padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Enviar Pago'),
+                        child: Text(
+                          'Enviar Pago',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -1104,7 +1197,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: Colors.blueAccent,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -1119,14 +1212,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       Navigator.pop(context); // Cierra el modal de confirmación
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.blue[700],
                       padding: const EdgeInsets.symmetric(
                           horizontal: 30, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('Cerrar'),
+                    child: Text(
+                      'Cerrar',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
